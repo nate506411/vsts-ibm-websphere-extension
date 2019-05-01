@@ -170,8 +170,18 @@ async function run() {
             }
         } else {
             tl.debug('update existing application');
+            tl.debug('update existing application');
+            let topologyType: string = tl.getInput('topologyType', true);
+            let startApplication: boolean = tl.getBoolInput('startApplication', false);            
             let updateOptions: string = tl.getInput('updateOptions', false) || '';
             command = `AdminApp.update('${appName}', 'app', '[-operation update -contents ${contentFile} ${updateOptions}]');  AdminConfig.save();`;
+            if(topologyType === 'cluster'){
+                let clusterName: string = tl.getInput('clusterName', false);
+                if (startApplication) {
+                    let startAppCommmand: string = `AdminNodeManagement.syncActiveNodes(); AdminApplication.startApplicationOnCluster('${appName}', '${clusterName}');`;
+                    command += startAppCommmand;
+                }
+            }
         }
 
         let wsadmin: ToolRunner = tl.tool(tl.which(wasCommand, true));
